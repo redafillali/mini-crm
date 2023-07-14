@@ -21,6 +21,10 @@ class User extends Authenticatable {
         'name',
         'email',
         'password',
+        'address',
+        'phone',
+        'birthdate',
+        'company_id',
     ];
 
     /**
@@ -42,4 +46,29 @@ class User extends Authenticatable {
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    /**
+    * Get the company that owns the user.
+    */
+
+    public function company() {
+        return $this->belongsTo( Company::class );
+    }
+
+    /**
+    * Get the invitations for the user.
+    */
+
+    public function invitations() {
+        return $this->hasMany( Invitation::class );
+    }
+
+    /**
+    * Get the admin sended invitations.
+    */
+
+    public function adminInvitations() {
+        return $this->hasMany( Invitation::class, 'inviter_id' );
+    }
+
 }
