@@ -45,6 +45,7 @@ class CompanyController extends Controller {
                 'address' => 'nullable',
                 'phone' => 'nullable',
             ] );
+            $this->authorize( 'create', Company::class );
             Company::create( request()->all() );
             return redirect()->route( 'companies.index' )->with( [
                 'message' => 'Société créée avec succès.',
@@ -110,12 +111,7 @@ class CompanyController extends Controller {
 
     public function destroy( Company $company ) {
         try {
-            if ( $company->users->count() > 0 ) {
-                return redirect()->route( 'companies.index' )->with( [
-                    'message' => 'Impossible de supprimer la société car elle contient des utilisateurs.',
-                    'type' => 'error',
-                ] );
-            }
+            $this->authorize( 'delete', $company );
             $company->delete();
             return redirect()->route( 'companies.index' )->with( [
                 'message' => 'Société supprimée avec succès.',

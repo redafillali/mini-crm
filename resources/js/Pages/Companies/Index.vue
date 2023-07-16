@@ -1,8 +1,8 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, router, useForm } from '@inertiajs/vue3';
+import { Head, usePage, useForm } from '@inertiajs/vue3';
 import Flash from '@/Components/Flash.vue';
-import { defineProps, ref } from 'vue';
+import { defineProps, ref, watch } from 'vue';
 
 
 
@@ -25,6 +25,30 @@ const deleteCompany = (companyId) => {
     }
 };
 
+// Search company
+const search = ref('');
+
+// Filter companies on keyup
+const companies = ref(usePage().props.companies);
+watch(search, (value) => {
+    companies.value = usePage().props.companies.filter((company) => {
+        return company.name.toLowerCase().includes(value.toLowerCase());
+    });
+});
+
+// Sort companies
+const sort = ref('');
+
+// Sort companies on change
+watch(sort, (value) => {
+    if (value === '') {
+        companies.value = usePage().props.companies;
+    } else {
+        companies.value = usePage().props.companies.sort((a, b) => {
+            return a[value].localeCompare(b[value]);
+        });
+    }
+});
 </script>
 
 <template>
@@ -36,14 +60,26 @@ const deleteCompany = (companyId) => {
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">La liste des sociétés</h2>
         </template>
         <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6 grid-cols-3">
                 <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                    {{ $page.props.flash.message }}
-                    <div class="flex justify-end">
-                        <a :href="route('companies.create')"
-                           class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                            Créer une nouvelle société
-                        </a>
+                    <div class="grid grid-cols-4 gap-6 justify-end mb-4">
+                        <select v-model="sort"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            <option value="">Trier par</option>
+                            <option value="name">Nom</option>
+                            <option value="address">Adresse</option>
+                            <option value="phone">Téléphone</option>
+                            <option value="email">Email</option>
+                        </select>
+                        <input type="text" placeholder="Rechercher une société"
+                               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                               v-model="search" />
+                        <div class="flex justify-end col-span-2">
+                            <a :href="route('companies.create')"
+                               class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded col-span-2">
+                                Créer une nouvelle société
+                            </a>
+                        </div>
                     </div>
                     <table class="table-auto w-full">
                         <thead>
