@@ -49,4 +49,34 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::delete('/companies/{company}', [CompanyController::class, 'destroy'])->name('companies.destroy');
 });
 
+// Employees Routes only for Admins
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/employees', [EmployeeController::class, 'index'])->name('employees.index');
+    Route::get('/employees/create', [EmployeeController::class, 'create'])->name('employees.create');
+    Route::post('/employees', [EmployeeController::class, 'store'])->name('employees.store');
+    Route::get('/employees/{employee}/edit', [EmployeeController::class, 'edit'])->name('employees.edit');
+    Route::put('/employees/{employee}', [EmployeeController::class, 'update'])->name('employees.update');
+    Route::delete('/employees/{employee}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
+});
+
+// Invitations Routes only for Admins
+Route::middleware(['auth', 'role:admin'])->group(function() {
+    Route::get('/invitations', [InvitationController::class, 'index'])->name('invitations.index');
+    Route::get('/invitations/create', [InvitationController::class, 'create'])->name('invitations.create');
+    Route::post('/invitations', [InvitationController::class, 'store'])->name('invitations.store');
+    Route::get('/invitations/{invitation}/edit', [InvitationController::class, 'edit'])->name('invitations.edit');
+    Route::put('/invitations/{invitation}', [InvitationController::class, 'update'])->name('invitations.update');
+    Route::delete('/invitations/{invitation}', [InvitationController::class, 'destroy'])->name('invitations.destroy');
+});
+
+// Invitation for Guests
+Route::get('/accept-invitation/{token}', [InvitationController::class, 'acceptInvitationForm'])->name('invitations.accept');
+
+// Espace Employé
+Route::middleware(['auth', 'role:employee'])->group(function() {
+    Route::get('/employee', function() {
+        return Inertia::render('Employee');
+    })->name('employee');
+});
+
 require __DIR__.'/auth.php';

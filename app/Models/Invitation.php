@@ -54,4 +54,17 @@ class Invitation extends Model {
     public function invitee() {
         return $this->belongsTo( User::class );
     }
+
+    /**
+    * getInvitationUrl
+    * @RouteName( 'invitations.accept' )
+    * @return string
+    */
+
+    public function getInvitationUrl() {
+        return route( 'invitations.accept', [
+            'invitation' => $this->id,
+            'token' => $this->token,
+        ] );
+    }
 }
