@@ -71,6 +71,7 @@ Route::middleware(['auth', 'role:admin'])->group(function() {
 
 // Invitation for Guests
 Route::get('/accept-invitation/{token}', [InvitationController::class, 'acceptInvitationForm'])->name('invitations.accept');
+Route::post('/invitation-create-employee/', [InvitationController::class, 'acceptInvitation'])->name('invitations.create-employee');
 
 // Espace Employé
 Route::middleware(['auth', 'role:employee'])->group(function() {

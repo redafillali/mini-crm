@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId( 'inviter_id' )->nullable()->constrained( 'users' );
             $table->foreignId( 'company_id' )->nullable()->constrained( 'companies' );
+            $table->string('invitee_name');
             // invitee_email is unique to prevent duplicate invitations
             $table->string('invitee_email')->unique();
             $table->string('status')->default( 'pending' );

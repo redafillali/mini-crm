@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Invitation;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
@@ -89,36 +90,65 @@ class InvitationController extends Controller {
     }
 
     /**
-    * Accept an invitation.
-    * @param  string  $token
-    */
-    public function acceptInvitation( $token ) {
+     * Accept invitation form
+     * @param  string  $token
+     */
+
+    public function acceptInvitationForm( $token ) {
+        $invitation = Invitation::where( 'token', $token )->firstOrFail();
+        return Inertia::render( 'Auth/RegisterEmployee', [
+            'invitation' => $invitation,
+        ] );
+    }
+
+    /**
+     * Accept invitation
+     * Create a new user and assign the employee role
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $token
+     */
+
+    public function acceptInvitation( Request $request, ) {
         try {
-            $invitation = Invitation::where( 'token', $token )->firstOrFail();
+            $request->validate( [
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users,email',
+                'password' => 'required|string|confirmed|min:8',
+                'token' => 'required|string|exists:invitations,token',
+            ] );
+
+            $invitation = Invitation::where( 'token', $request->token )->firstOrFail();
+            // Check if the invitation is still pending
+            if ( !$invitation || $invitation->status !== 'pending' ) {
+                return redirect()->route( 'dashboard' )->with( [
+                    'message' => 'Cette invitation n\'est plus valide.',
+                    'type' => 'error',
+                ] );
+            }
+            $user = User::create( [
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => bcrypt( $request->password ),
+            ] );
+
+            $user->assignRole( 'employee' );
+            $user->company()->associate( $invitation->company );
+            $user->save();
+
             $invitation->status = 'accepted';
-            $invitation->accepted_at = now();
             $invitation->save();
+
+            dd( $user, $invitation );
             return redirect()->route( 'dashboard' )->with( [
                 'message' => 'Invitation acceptée avec succès.',
                 'type' => 'success',
             ] );
         } catch ( \Exception $e ) {
+            dd( $e->getMessage() );
             return redirect()->route( 'dashboard' )->with( [
                 'message' => 'Une erreur est survenue lors de l\'acceptation de l\'invitation.',
                 'type' => 'error',
             ] );
         }
     }
-
-    /**
-     * Accept invitation form
-     * @param  string  $token
-     */
-
-    public function acceptInvitationForm( $token ) {
-            $invitation = Invitation::where( 'token', $token )->firstOrFail();
-            return Inertia::render( 'Auth/RegisterEmployee', [
-                'invitation' => $invitation,
-            ] );
-        }
-    }
+}

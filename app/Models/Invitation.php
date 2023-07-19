@@ -14,6 +14,7 @@ class Invitation extends Model {
     protected $fillable = [
         'inviter_id',
         'company_id',
+        'invitee_name',
         'invitee_email',
         'status',
         'token',
@@ -63,7 +64,6 @@ class Invitation extends Model {
 
     public function getInvitationUrl() {
         return route( 'invitations.accept', [
-            'invitation' => $this->id,
             'token' => $this->token,
         ] );
     }
