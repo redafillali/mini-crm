@@ -11,10 +11,9 @@ use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class ProfileController extends Controller
-{
+class ProfileController extends Controller {
     /**
-     * Display the user's profile form.
+    * Display the user's profile form.
      */
     public function edit(Request $request): Response
     {
@@ -26,38 +25,55 @@ class ProfileController extends Controller
 
     /**
      * Update the user's profile information.
-     */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
-    {
-        $request->user()->fill($request->validated());
+    */
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+    public function update( Request $request ): RedirectResponse {
+        try{
+            $request->validate( [
+                'name' => [ 'required', 'max:255' ],
+                'email' => [ 'required', 'email', 'max:255', 'unique:users,email,' . $request->user()->id ],
+                'address' => [ 'required', 'max:255' ],
+                'phone' => [ 'required', 'max:255' ],
+                'birthdate' => [ 'required', 'date' ],
+            ] );
+
+            $request->user()->forceFill( [
+                'name' => $request->name,
+                'email' => $request->email,
+                'address' => $request->address,
+                'phone' => $request->phone,
+                'birthdate' => $request->birthdate,
+            ] )->save();
+            return Redirect::route('profile.edit')->with([
+                'message' => 'Profil mis à jour avec succès.',
+                'status' => 'success'
+            ]);
+        } catch (\Exception $e) {
+            return Redirect::route('profile.edit')->with([
+                'message' => 'Une erreur est survenue lors de la mise à jour du profil.',
+                'status' => 'error'
+            ]);
         }
-
-        $request->user()->save();
-
-        return Redirect::route('profile.edit');
     }
 
     /**
      * Delete the user's account.
-     */
-    public function destroy(Request $request): RedirectResponse
-    {
-        $request->validate([
-            'password' => ['required', 'current_password'],
-        ]);
+        */
 
-        $user = $request->user();
+        public function destroy( Request $request ): RedirectResponse {
+            $request->validate( [
+                'password' => [ 'required', 'current_password' ],
+            ] );
 
-        Auth::logout();
+            $user = $request->user();
 
-        $user->delete();
+            Auth::logout();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+            $user->delete();
 
-        return Redirect::to('/');
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return Redirect::to( '/' );
+        }
     }
-}

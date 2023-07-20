@@ -145,13 +145,11 @@ class InvitationController extends Controller {
             $invitation->status = 'accepted';
             $invitation->save();
 
-            dd( $user, $invitation );
             return redirect()->route( 'dashboard' )->with( [
                 'message' => 'Invitation acceptée avec succès.',
                 'type' => 'success',
             ] );
         } catch ( \Exception $e ) {
-            dd( $e->getMessage() );
             return redirect()->route( 'dashboard' )->with( [
                 'message' => 'Une erreur est survenue lors de l\'acceptation de l\'invitation.',
                 'type' => 'error',

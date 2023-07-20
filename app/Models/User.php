@@ -72,4 +72,12 @@ class User extends Authenticatable {
         return $this->hasMany( Invitation::class, 'inviter_id' );
     }
 
+    /**
+    * Get User role
+    */
+
+    public function getRoleAttribute() {
+        return $this->roles->first()->name;
+    }
+
 }

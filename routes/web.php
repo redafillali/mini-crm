@@ -30,6 +30,9 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
+    if(!auth()->user()->hasRole('admin')) {
+        return redirect()->route('employee');
+    }
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -74,9 +77,9 @@ Route::get('/accept-invitation/{token}', [InvitationController::class, 'acceptIn
 Route::post('/invitation-create-employee/', [InvitationController::class, 'acceptInvitation'])->name('invitations.create-employee');
 
 // Espace Employé
-Route::middleware(['auth', 'role:employee'])->group(function() {
-    Route::get('/employee', function() {
-        return Inertia::render('Employee');
+Route::prefix('employee')->middleware(['auth', 'role:employee', 'is-active'])->group(function() {
+    Route::get('/', function() {
+        return Inertia::render('Profile/Employee');
     })->name('employee');
 });
 
