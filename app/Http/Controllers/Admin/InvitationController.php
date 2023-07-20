@@ -115,6 +115,9 @@ class InvitationController extends Controller {
                 'email' => 'required|string|email|max:255|unique:users,email',
                 'password' => 'required|string|confirmed|min:8',
                 'token' => 'required|string|exists:invitations,token',
+                'address' => 'required|string|max:255',
+                'phone' => 'required|string|max:255',
+                'birthdate' => 'required|date',
             ] );
 
             $invitation = Invitation::where( 'token', $request->token )->firstOrFail();
@@ -129,6 +132,10 @@ class InvitationController extends Controller {
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => bcrypt( $request->password ),
+                'address' => $request->address,
+                'phone' => $request->phone,
+                'birthdate' => $request->birthdate,
+                'is_active' => true,
             ] );
 
             $user->assignRole( 'employee' );

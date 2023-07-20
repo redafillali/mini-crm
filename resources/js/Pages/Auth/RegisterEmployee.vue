@@ -14,6 +14,9 @@ const form = useForm({
     password: '',
     password_confirmation: '',
     token: invitation ? invitation['token'] : '',
+    address: '',
+    phone: '',
+    birthdate: '',
 });
 
 // Create Employee account
@@ -60,6 +63,51 @@ const submit = () => {
                            disabled />
 
                 <InputError class="mt-2" :message="form.errors.email" />
+            </div>
+
+            <div class="mt-4">
+                <InputLabel for="address" value="Address" />
+
+                <TextInput
+                           id="address"
+                           type="text"
+                           class="mt-1 block w-full"
+                           v-model="form.address"
+                           required
+                           autofocus
+                           autocomplete="address" />
+
+                <InputError class="mt-2" :message="form.errors.address" />
+            </div>
+
+            <div class="mt-4">
+                <InputLabel for="phone" value="Phone" />
+
+                <TextInput
+                           id="phone"
+                           type="text"
+                           class="mt-1 block w-full"
+                           v-model="form.phone"
+                           required
+                           autofocus
+                           autocomplete="phone" />
+
+                <InputError class="mt-2" :message="form.errors.phone" />
+            </div>
+
+            <div class="mt-4">
+                <InputLabel for="birthdate" value="Birthdate" />
+
+                <TextInput
+                           id="birthdate"
+                           type="date"
+                           class="mt-1 block w-full"
+                           v-model="form.birthdate"
+                           required
+                           autofocus
+                           autocomplete="birthdate" />
+
+                <InputError class="mt-2" :message="form.errors.birthdate" />
             </div>
 
             <div class="mt-4">
